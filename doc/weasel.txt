@@ -1,0 +1,25 @@
+*weasel.txt* Plugin to find weasel words and other language issues        Mar 09, 2012
+*weasel.vim*
+
+Author: Bjoern Doebel <doebel@tudos.org>
+Copyright: (c) 2012 Bjoern Doebel                         *weasel-copyright*
+           The VIM LICENSE applies to weasel.vim and weasel.txt
+           (see |copyright|) except use of "weasel" instead of "Vim"
+           No warranty, express or implied.  Use At-Your-Own-Risk.
+
+==========================================================================
+1. Contents                                                *weasel-contents*
+
+    1. Contents.............................: |weasel-contents|
+    2. Description..........................: |weasel-desc|
+    3. Mappings & Settings..................: |weasel-config|
+
+==========================================================================
+2. Description                                                 *weasel-desc*
+
+    This plugin provides mechanisms to search for common writing bugs
+    described by Matt Might in <XXX URL>. These bugs fall into three
+    categories:
+    1) Use of passive
+    2) Use of weasel words
+    3) Repeated words
