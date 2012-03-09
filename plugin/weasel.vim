@@ -8,8 +8,8 @@ if exists("g:loaded_weasel")
 	echo "Already loaded"
 	finish
 endif
-let g:loaded_weasel = 1
 
+let g:loaded_weasel = 1
 
 function! s:UnloadWeasel()
 	unlet g:loaded_weasel
@@ -18,38 +18,62 @@ function! s:UnloadWeasel()
 	unmap <Plug>WeaselUnload
 	unmap <SID>UnloadWeasel
 
-	unmap <Leader>r
-	unmap <Plug>WeaselRepeated
-	unmap <SID>RepeatedWords
+	unmap <Leader>w
+	unmap <Plug>WeaselFunc
+	unmap <SID>WeaselFunc
 endfunction
 
 " 
 " A test the the
 
-function! s:RepeatedWords()
-	call Dfunc("RepeatedWords")
-	let lines = getline(0, "$")
-	Decho("Lines: ".len(lines))
-	let lastword = ""
-	let lineno = 0
-	let resList = []
-	for l in lines
-		let lineno += 1
-		for w in split(l)
-			" Skip non-words
-			if w !~ '[a-zA-Z]\+'
-				continue
-			endif
-			if w == lastword
-				let resList += [lineno, lastword]
-				Decho("Repeat: ".lastword)
-			endif
-			let lastword = w
-		endfor
+
+function! s:Skip_nonword(word)
+    if a:word !~ '[a-zA-Z]\+'
+        return 1
+    else
+        return 0
+    endif
+endfunction
+
+function! s:WriteErrors(resList)
+	call writefile(a:resList, "/tmp/weasel_errors.txt")
+endfunction
+
+function! s:OpenQuickfix()
+	"XXX make file configurable
+	execute "cfile /tmp/weasel_errors.txt"
+	execute "copen 10"
+endfunction
+
+function! s:RepeatWords(line,number)
+	let res = []
+	for w in split(a:line)
+		if s:Skip_nonword(w)
+			continue
+		endif
+		if w == s:lastword
+			let res += [bufname("%").":".a:number.":".s:lastword." repeated"] 
+		endif
+		let s:lastword = w
 	endfor
-	Decho("lastword: ".lastword)
-	Decho(resList)
-	call Dret("RepeatedWords")
+	return res
+endfunction
+
+
+function! s:WeaselFunc()
+	let s:lastword = ""
+
+	let lines    = getline(0, "$") "read all lines
+	let lineno   = 0               "current line #
+	let resList  = []              "list of errors
+
+	for l in lines
+	   let lineno  += 1
+	   let resList += s:RepeatWords(l, lineno)
+	endfor
+
+	call s:WriteErrors(resList)
+	call s:OpenQuickfix()
 endfunction
 
 
@@ -60,8 +84,8 @@ if !hasmapto('<Plug>UnloadWeasel')
 endif
 
 
-if !hasmapto('<Plug>WeaselRepeated')
-	map <unique> <Leader>r <Plug>WeaselRepeated
-	noremap <unique> <script> <Plug>WeaselRepeated <SID>RepeatedWords
-	noremap <SID>RepeatedWords :call <SID>RepeatedWords()<CR>
+if !hasmapto('<Plug>WeaselFunc')
+	map <unique> <Leader>w <Plug>WeaselFunc
+	noremap <unique> <script> <Plug>WeaselFunc <SID>WeaselFunc
+	noremap <SID>WeaselFunc :call <SID>WeaselFunc()<CR>
 endif
