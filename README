@@ -1,0 +1,17 @@
+VIM plugin for finding common language errors
+=============================================
+
+Writing prose is tedious and as soon as it gets more complex than finding
+spelling errors, the task of correcting mistakes can hardly be automated.
+
+Heuristics can help, though. This plugin takes Matt Might's recommendations
+from his blog (XXX URL) and translates his shell script heuristics into
+Vim script.
+
+USAGE
+-----
+
+
+TODO
+----
+* can we also incorporate Michael Hohmuth's checkbiw?
