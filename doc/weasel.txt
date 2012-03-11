@@ -13,13 +13,22 @@ Copyright: (c) 2012 Bjoern Doebel                         *weasel-copyright*
     1. Contents.............................: |weasel-contents|
     2. Description..........................: |weasel-desc|
     3. Mappings & Settings..................: |weasel-config|
+    4. References...........................: |weasel-refs|
 
 ==========================================================================
 2. Description                                                 *weasel-desc*
 
     This plugin provides mechanisms to search for common writing bugs
-    described by Matt Might in <XXX URL>. These bugs fall into three
+    described by Matt Might in [1]. These bugs fall into three
     categories:
     1) Use of passive
     2) Use of weasel words
     3) Repeated words
+
+==========================================================================
+3. Mappings & Settings                                        *weasel-config*
+
+==========================================================================
+4. References
+
+[1] http://matt.might.net/articles/shell-scripts-for-passive-voice-weasel-words-duplicates/

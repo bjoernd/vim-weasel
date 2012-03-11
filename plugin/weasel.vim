@@ -1,5 +1,6 @@
 " Vim plugin for handling Matt Might's recommendations on writing
-" style. For details see <XXX INSERT URL>
+" style. For details see
+" http://matt.might.net/articles/shell-scripts-for-passive-voice-weasel-words-duplicates/
 " Last Change:  2012-03-09
 " Maintainer: 	Björn Döbel <doebel@tudos.org>
 " License: 		This file is placed in the public domain
