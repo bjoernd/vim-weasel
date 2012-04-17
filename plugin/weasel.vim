@@ -26,15 +26,6 @@ function! s:UnloadWeasel()
 	unmap <SID>WeaselFunc
 endfunction
 
-" 
-" A test for the the functionality of finding
-" duplicate words. To figure this this out, we
-" have this text here with a lot of words and one
-" one might easily miss a duplicate in here, so the
-" script is hopefully going to help us find find these 
-" errors.
-
-
 " Returns true if a string is a word.
 function! s:Skip_nonword(word)
     if a:word !~ '[a-zA-Z]\+'
@@ -56,6 +47,60 @@ function! s:OpenQuickfix()
 	execute "cfile /tmp/weasel_errors.txt"
 	execute "copen 10"
 endfunction
+
+
+" Find out of a list contains an item.
+"
+" XXX: I'm pretty sure that VIML already has such a function
+"      and I just didn't find it. :(
+function! s:Contains(liste, item)
+	for l in a:liste
+		if l == a:item
+			return 1
+		endif
+	endfor
+	return 0
+endfunction
+
+" === TEST WEASEL WORDS ===
+"
+" This text has significantly more content than I would
+" have expected. This is extremely nice and remarkably great.
+" Surprisingly, I like this text substantially more than others.
+function! s:WeaselWords(line,number)
+	let weasels=["many","various","very","fairly","several", 
+				 \ "extremely","exceedingly","quite","remarkably",
+				 \ "few","surprisingly", "mostly","largely","huge",
+				 \ "tiny","a number", "excellent","interestingly",
+				 \ "significantly", "substantially","clearly",
+				 \ "vast","relatively","completely"]
+	let res = []
+
+	for w in split(a:line)
+		if s:Skip_nonword(w)
+			continue
+		endif
+		
+		let w2 = tolower(w)
+		let w2 = substitute(w2, "[,.:?!]", "", "g")
+
+		if s:Contains(weasels, w2)
+			let res += [bufname("%").":".a:number.": Weasel word: '".w."'"]
+		endif
+	endfor
+
+	return res
+endfunction
+
+
+" === TEST REPEATED WORDS ===
+" A test for the the functionality of finding
+" duplicate words. To figure this this out, we
+" have this text here with a lot of words and one
+" one might easily miss a duplicate in here, so the
+" script is hopefully going to help us find find these 
+" errors.
+
 
 " Find repeated words (within a line as well as across
 " adjacent lines).
@@ -95,6 +140,7 @@ function! s:WeaselFunc()
 	for l in lines
 	   let lineno  += 1
 	   let resList += s:RepeatWords(l, lineno)
+	   let resList += s:WeaselWords(l, lineno)
 	endfor
 
 	call s:WriteErrors(resList)
