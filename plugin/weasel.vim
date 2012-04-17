@@ -1,7 +1,7 @@
 " Vim plugin for handling Matt Might's recommendations on writing
 " style. For details see
 " http://matt.might.net/articles/shell-scripts-for-passive-voice-weasel-words-duplicates/
-" Last Change:  2012-03-09
+" Last Change:  2012-04-17
 " Maintainer: 	Björn Döbel <doebel@tudos.org>
 " License: 		This file is placed in the public domain
 
@@ -11,6 +11,7 @@ if exists("g:loaded_weasel")
 endif
 
 let g:loaded_weasel = 1
+
 
 " DEBUG: This function unloads the script so that we can reload
 "        it with new mappings and functions.
@@ -26,6 +27,7 @@ function! s:UnloadWeasel()
 	unmap <SID>WeaselFunc
 endfunction
 
+
 " Returns true if a string is a word.
 function! s:Skip_nonword(word)
     if a:word !~ '[a-zA-Z]\+'
@@ -35,11 +37,13 @@ function! s:Skip_nonword(word)
     endif
 endfunction
 
+
 " Write list of results into error file.
 function! s:WriteErrors(resList)
 	"XXX make file configurable
 	call writefile(a:resList, "/tmp/weasel_errors.txt")
 endfunction
+
 
 " Open error file in quickfix window
 function! s:OpenQuickfix()
@@ -62,12 +66,14 @@ function! s:Contains(liste, item)
 	return 0
 endfunction
 
+
+
 " === TEST WEASEL WORDS ===
 "
 " This text has significantly more content than I would
 " have expected. This is extremely nice and remarkably great.
 " Surprisingly, I like this text substantially more than others.
-function! s:WeaselWords(line,number)
+function! s:WeaselWords(word)
 	let weasels=["many","various","very","fairly","several", 
 				 \ "extremely","exceedingly","quite","remarkably",
 				 \ "few","surprisingly", "mostly","largely","huge",
@@ -76,21 +82,65 @@ function! s:WeaselWords(line,number)
 				 \ "vast","relatively","completely"]
 	let res = []
 
-	for w in split(a:line)
-		if s:Skip_nonword(w)
-			continue
-		endif
-		
-		let w2 = tolower(w)
-		let w2 = substitute(w2, "[,.:?!]", "", "g")
+	let w2 = tolower(a:word)
+	let w2 = substitute(w2, "[,.:?!]", "", "g")
+	if s:Contains(weasels, w2)
+		return 1
+	endif
 
-		if s:Contains(weasels, w2)
-			let res += [bufname("%").":".a:number.": Weasel word: '".w."'"]
-		endif
-	endfor
-
-	return res
+	return 0
 endfunction
+
+
+
+" === TEST PASSIVE ===
+"
+"  have been implemented
+"  i am bound to say
+function! s:PassiveWords(word)
+	let irregulars= ["awoken","been","born","beat","become","begun","bent",
+				\ "beset","bet","bid","bidden","bound","bitten",
+				\ "bled","blown","broken","bred","brought","broadcast",
+				\ "built","burnt","burst","bought","cast","caught",
+				\ "chosen","clung","come","cost","crept","cut",
+				\ "dealt","dug","dived","done","drawn","dreamt",
+				\ "driven","drunk","eaten","fallen","fed","felt","fought","found",
+				\ "fit","fled","flung","flown","forbidden","forgotten",
+				\ "foregone","forgiven","forsaken","frozen",
+				\ "gotten","given","gone","ground","grown","hung",
+				\ "heard","hidden","hit","held","hurt","kept","knelt",
+				\ "knit","known","laid","led","leapt","learnt","left",
+				\ "lent","let","lain","lighted","lost","made","meant","met",
+				\ "misspelt","mistaken","mown","overcome","overdone","overtaken",
+				\ "overthrown","paid","pled","proven","put","quit","read","rid","ridden",
+				\ "rung","risen","run","sawn","said","seen","sought","sold","sent",
+				\ "set","sewn","shaken","shaven","shorn","shed","shone","shod",
+				\ "shot","shown","shrunk","shut","sung","sunk","sat","slept",
+				\ "slain","slid","slung","slit","smitten","sown","spoken","sped",
+				\ "spent","spilt","spun","spit","split","spread","sprung","stood",
+				\ "stolen","stuck","stung","stunk","stridden","struck","strung",
+				\ "striven","sworn","swept","swollen","swum","swung","taken",
+				\ "taught","torn","told","thought","thrived","thrown","thrust",
+				\ "trodden","understood","upheld","upset","woken","worn","woven",
+				\ "wed","wept","wound","won","withheld","withstood","wrung","written"]
+
+	let passive_words = ["am","are","were","being","is","been","was","be"]
+
+	let last = tolower(s:lastword)
+	if s:Contains(passive_words, last)
+		let w2 = tolower(a:word)
+		let w2 = substitute(w2, "[,.:?!]", "", "g")
+		if s:Contains(irregulars, w2)
+			return 1
+		endif
+		if w2 =~? '\w\+ed'
+			return 1
+		endif
+	endif
+
+	return 0
+endfunction
+
 
 
 " === TEST REPEATED WORDS ===
@@ -104,25 +154,35 @@ endfunction
 
 " Find repeated words (within a line as well as across
 " adjacent lines).
-function! s:RepeatWords(line,number)
+function! s:RepeatWords(word)
+	if a:word == s:lastword
+		return 1
+	endif
+	return 0
+endfunction
 
+
+function! s:WordLoop(line, number)
 	let res = []
 
 	for w in split(a:line)
-
 		if s:Skip_nonword(w)
 			continue
 		endif
-		" XXX: Might want to skip "syntax" elements,
-		"      e.g., of a programming language as well
 
-		if w == s:lastword
+		if s:RepeatWords(w)
 			let res += [bufname("%").":".a:number.":'".s:lastword."' repeated"] 
 		endif
 
-		" don't forget to store last word
-		let s:lastword = w
+		if s:WeaselWords(w)
+			let res += [bufname("%").":".a:number.": Weasel word: '".w."'"]
+		endif
 
+		if s:PassiveWords(w)
+			let res += [bufname("%").":".a:number.": Passive voice: '".s:lastword." ".w."'"] 
+		endif
+
+		let s:lastword = w
 	endfor
 
 	return res
@@ -139,8 +199,7 @@ function! s:WeaselFunc()
 
 	for l in lines
 	   let lineno  += 1
-	   let resList += s:RepeatWords(l, lineno)
-	   let resList += s:WeaselWords(l, lineno)
+	   let resList += s:WordLoop(l, lineno)
 	endfor
 
 	call s:WriteErrors(resList)
