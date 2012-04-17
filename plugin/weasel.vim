@@ -28,9 +28,13 @@ function! s:UnloadWeasel()
 endfunction
 
 
+" =================================================
+" Helper functions
+" =================================================
+
 " Returns true if a string is a word.
-function! s:Skip_nonword(word)
-    if a:word !~ '[a-zA-Z]\+'
+function! s:IsWord(word)
+    if a:word =~ '[a-zA-Z]\+'
         return 1
     else
         return 0
@@ -97,6 +101,8 @@ endfunction
 "
 "  have been implemented
 "  i am bound to say
+
+" Find passive voice
 function! s:PassiveWords(word)
 	let irregulars= ["awoken","been","born","beat","become","begun","bent",
 				\ "beset","bet","bid","bidden","bound","bitten",
@@ -162,13 +168,22 @@ function! s:RepeatWords(word)
 endfunction
 
 
+" Word loop. Iterates over the words in a line and calls the
+" error checkers. If an error is found, adds a resulting line
+" to the future quickfix buffer.
+"
+" Also, this function keeps track of the s:lastword variable
+" containing the previous word as it is used by multiple
+" checkers.
 function! s:WordLoop(line, number)
 	let res = []
 
 	for w in split(a:line)
-		if s:Skip_nonword(w)
+		if !s:IsWord(w)
 			continue
 		endif
+
+		" XXX: make the actual checkers used configurable
 
 		if s:RepeatWords(w)
 			let res += [bufname("%").":".a:number.":'".s:lastword."' repeated"] 
@@ -189,7 +204,8 @@ function! s:WordLoop(line, number)
 endfunction
 
 
-" Main function. Iterates over all lines in the current buffer.
+" Main function. Iterates over all lines in the current buffer and
+" afterwards opens the quickfix window.
 function! s:WeaselFunc()
 	let s:lastword = ""
 
