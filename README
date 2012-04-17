@@ -5,12 +5,16 @@ Writing prose is tedious and as soon as it gets more complex than finding
 spelling errors, the task of correcting mistakes can hardly be automated.
 
 Heuristics can help, though. This plugin takes Matt Might's recommendations
-from his blog (XXX URL) and translates his shell script heuristics into
-Vim script.
+from his blog [1] and translates his shell script heuristics into Vim script.
+
+[1] http://matt.might.net/articles/shell-scripts-for-passive-voice-weasel-words-duplicates/
 
 USAGE
 -----
-
+Simple: Have a document (txt, latex, ...) open and call s:WeaselFunc(). By
+default this call is mapped to <Leader-w>, which is '\'+w in my case. The
+plugin then parses all your text (yes, this may take some time) and generates
+a quickfix window containing all locations where it found something notable.
 
 TODO
 ----

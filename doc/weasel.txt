@@ -1,4 +1,4 @@
-*weasel.txt* Plugin to find weasel words and other language issues        Mar 09, 2012
+*weasel.txt* Plugin to find weasel words and other language issues        Apr 17, 2012
 *weasel.vim*
 
 Author: Bjoern Doebel <doebel@tudos.org>
@@ -27,6 +27,14 @@ Copyright: (c) 2012 Bjoern Doebel                         *weasel-copyright*
 
 ==========================================================================
 3. Mappings & Settings                                        *weasel-config*
+
+    <Leader-w> Mapped to the plugin's single entry function. Calling this
+               function will run through your currently open document and
+               create a list of notable locations (use of passive voice,
+               use of weasel words, repetition of words). This list is then
+               displayed in a |quickfix| window.
+
+    <Leader-u> Unloads the script. (Used for debugging purposes.)
 
 ==========================================================================
 4. References
