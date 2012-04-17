@@ -77,6 +77,22 @@ endfunction
 " This text has significantly more content than I would
 " have expected. This is extremely nice and remarkably great.
 " Surprisingly, I like this text substantially more than others.
+"
+"  Bad:    It is quite difficult to find untainted samples.
+"  Better: It is difficult to find untainted samples.
+"
+"  Bad:    We used various methods to isolate four samples.
+"  Better: We isolated four samples.
+"
+"  Bad:    False positives were surprisingly low.
+"  Better: To our surprise, false positives were low.
+"  Good:   To our surprise, false positives were low (3%).
+"
+"  Bad:    There is very close match between the two semantics.
+"  Better: There is a close match between the two semantics.
+"
+"  Bad:    We offer a completely different formulation of CFA.
+"  Better: We offer a different formulation of CFA.
 function! s:WeaselWords(word)
 	let weasels=["many","various","very","fairly","several", 
 				 \ "extremely","exceedingly","quite","remarkably",
@@ -101,6 +117,10 @@ endfunction
 "
 "  have been implemented
 "  i am bound to say
+"
+"  Bad:    Termination is guaranteed on any input.
+"  Better: Termination is guaranteed on any input by a finite state-space.
+"  OK:     A finite state-space guarantees termination on any input.
 
 " Find passive voice
 function! s:PassiveWords(word)
@@ -156,7 +176,16 @@ endfunction
 " one might easily miss a duplicate in here, so the
 " script is hopefully going to help us find find these 
 " errors.
-
+"
+"  Many readers are not aware that the
+"  the brain will automatically ignore
+"  a second instance of the word "the"
+"  when it starts a new line. 
+" 
+"  Many readers are not aware that the the
+"  brain will automatically ignore a second
+"  instance of the word "the" when it starts
+"  a new line. 
 
 " Find repeated words (within a line as well as across
 " adjacent lines).
